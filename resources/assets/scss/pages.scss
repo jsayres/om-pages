@@ -1,0 +1,51 @@
+@import "bootstrap";
+@import "font-awesome";
+
+.app-bar {
+  margin-bottom: 0;
+  .navbar-brand {
+    cursor: pointer;
+  }
+  .navbar-btn {
+    margin-left: 6px;
+  }
+}
+
+table#page-list {
+  font-size: 12px;
+  user-select: none;
+  th {
+    a {
+      cursor: pointer;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+    .fa-caret-up, .fa-caret-down {
+      color: #aaa;
+      margin-left: 7px;
+    }
+  }
+  tbody tr {
+    cursor: pointer;
+  }
+}
+
+#page-view {
+  display: flex;
+  #page-render {
+    flex: 1 0;
+    margin: 20px 50px;
+    border: 1px solid #ddd;
+    box-shadow: 4px 4px 7px -3px #ddd;
+    .container {
+      width: 100%;
+    }
+  }
+  #page-versions {
+    flex: 0 0 200px;
+    .selected {
+      background-color: #ddd;
+    }
+  }
+}

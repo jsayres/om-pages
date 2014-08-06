@@ -1,0 +1,13 @@
+pom.xml
+*jar
+/lib/
+/classes/
+/out/
+/target/
+/resources/assets/bower_components
+/resources/public/js
+/resources/public/css
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+.sass-cache/

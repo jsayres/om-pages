@@ -1,0 +1,14 @@
+{
+  "name": "pages app assets",
+  "version": "0.0.1",
+  "authors": [
+    "Jason Sayres <jason.sayres@stevens.edu>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
