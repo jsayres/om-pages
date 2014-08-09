@@ -26,7 +26,7 @@
   (.preventDefault evt)
   (.stopPropagation evt)
   (set-modal
-    {:title "Unsaved Changes to Page"
+    {:title "Unsaved Changes"
      :content "You have made changes to this page that have not
               yet been saved. How do you wish to proceed?"
      :options [{:text "Discard Changes"
@@ -44,9 +44,10 @@
             dirty? (:dirty edit-cursor)
             view-url (str "#" (:page-id edit-cursor))]
         (dom/div #js {:className "navbar-right"}
-          (dom/a #js {:className (str btn-classes (when (not dirty?) " disabled"))
-                      :onClick (when dirty? #(update-page edit-cursor))}
-            "Save")
+          (when dirty?
+            (dom/a #js {:className (str btn-classes " btn-primary")
+                        :onClick (when dirty? #(update-page edit-cursor))}
+              "Save"))
           (dom/a #js {:className btn-classes
                       :onClick (when dirty? #(edit-done % view-url))
                       :href view-url}
@@ -61,9 +62,12 @@
        :inline true
        :menu_bar false})
 
-(defn set-dirty! [editor edit-cursor]
+(defn set-dirty [editor edit-cursor]
   (let [start-content (.-startContent editor)
-        current-content (.getContent editor {:format "raw"})]
+        current-content (.getContent editor #js {:format "raw"})]
+    (.log js/console "checking dirty")
+    (.log js/console start-content)
+    (.log js/console current-content)
     (om/transact! edit-cursor :dirty #(not= start-content current-content))))
 
 
@@ -76,8 +80,8 @@
     (did-mount [_]
       (.init js/tinymce tinymce-opts)
       (let [editor (.-activeEditor js/tinymce)]
-        (.on editor "blur" #(set-dirty! editor edit-cursor))
-        (.on editor "change" #(set-dirty! editor edit-cursor))))
+        (.on editor "blur" #(set-dirty editor edit-cursor))
+        (.on editor "change" #(set-dirty editor edit-cursor))))
     om/IWillUnmount
     (will-unmount [_]
       (.remove js/tinymce "#content"))
