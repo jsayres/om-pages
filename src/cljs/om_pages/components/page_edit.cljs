@@ -65,9 +65,6 @@
 (defn set-dirty [editor edit-cursor]
   (let [start-content (.-startContent editor)
         current-content (.getContent editor #js {:format "raw"})]
-    (.log js/console "checking dirty")
-    (.log js/console start-content)
-    (.log js/console current-content)
     (om/transact! edit-cursor :dirty #(not= start-content current-content))))
 
 
