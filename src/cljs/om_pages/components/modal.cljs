@@ -35,20 +35,13 @@
     (will-mount [_]
       (go (loop []
         (om/set-state! owner :modal {:opts (<! modal-opts-chan) :state :init})
+        (<! (timeout 50))
+        (om/set-state! owner [:modal :state] :in)
         (<! modal-close-chan)
         (om/set-state! owner [:modal :state]  :out)
         (<! (timeout fade-time))
+        (om/set-state! owner :modal {:opts nil :state :clear})
         (recur))))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (let [state (om/get-state owner [:modal :state])]
-        (cond
-          (= state :init) (js/setTimeout
-                            #(om/set-state! owner [:modal :state] :in))
-          (= state :out) (go
-                           (<! (timeout fade-time))
-                           (om/set-state! owner [:modal] {:state :clear})))))
 
     om/IRenderState
     (render-state [_ {{:keys [opts state]} :modal}]
