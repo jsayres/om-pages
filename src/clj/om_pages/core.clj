@@ -2,8 +2,11 @@
   (:require [clojure.set :refer [select]]
             [ring.util.response :refer [file-response redirect]]
             [ring.adapter.jetty :refer [run-jetty]]
-            [compojure.core :refer [defroutes GET PUT]]
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [ring.middleware.json :refer [wrap-json-params]]
+            [compojure.core :refer [defroutes GET POST PUT]]
             [compojure.route :as route]
+            [compojure.handler :as handler]
             [om-pages.util :refer [json-response]]))
 
 
@@ -84,7 +87,7 @@
               (-> (select #(not= branch-id (get-in pages [% :branch-id])) published)
                   (conj id)))))
 
-(defn publish-page! [id]
+(defn publish-page [id]
   (let [{:keys [pages published]} @page-db
         {:keys [branch-id] :as page} (get pages id)]
     (json-response
@@ -95,11 +98,30 @@
 
 
 ;;;
-; Publish specified page
+; Unpublish specified page
 ;;;
-(defn unpublish-page! [id]
+(defn unpublish-page [id]
   (swap! page-db #(update-in % [:published] disj id))
   (json-response {:published false}))
+
+
+;;;
+; Save page
+;;;
+(defn save-page [page]
+  (swap! page-db
+    (fn [db]
+      (let [next-id (->> (:pages db) (keys) (apply max) (inc))]
+        (assoc-in db [:pages next-id] page))))
+  (json-response {:saved true}))
+
+;;;
+; Update page
+;;;
+(defn update-page [id page]
+  (swap! page-db (fn [db] (assoc-in db [:pages id] page)))
+  (json-response {:updated true}))
+
 
 ;;;
 ; Routes
@@ -108,11 +130,15 @@
   (GET "/" [] (redirect "/pages"))
   (GET "/pages" [] (index))
   (GET "/api/pages" [] (get-pages-list))
+  (POST "/api/pages" [page] (save-page page))
   (GET ["/api/pages/:id" :id #"[0-9]+"] [id] (get-page (read-string id)))
-  (PUT ["/api/pages/:id/publish" :id #"[0-9]+"] [id] (publish-page! (read-string id)))
-  (PUT ["/api/pages/:id/unpublish" :id #"[0-9]+"] [id] (unpublish-page! (read-string id)))
+  (PUT ["/api/pages/:id" :id #"[0-9]+"] [id page] (update-page (read-string id) page))
+  (PUT ["/api/pages/:id/publish" :id #"[0-9]+"] [id] (publish-page (read-string id)))
+  (PUT ["/api/pages/:id/unpublish" :id #"[0-9]+"] [id] (unpublish-page (read-string id)))
   (route/files "/" {:root "resources/public"}))
+
+(def app (wrap-json-params (wrap-keyword-params routes)))
 
 
 (defn -main []
-  (run-jetty routes {:port 3000}))
+  (run-jetty app {:port 3000}))

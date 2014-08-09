@@ -19,5 +19,5 @@
   (let [xhr (XhrIo.)]
     (events/listen xhr goog.net.EventType.COMPLETE #(on-complete (xhr->clj xhr)))
     (. xhr
-       (send url method (when data (clj->js data))
+       (send url method (when data (.stringify js/JSON (clj->js data)))
              #js {"Content-Type" "application/json"}))))

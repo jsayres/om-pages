@@ -8,8 +8,9 @@
                  [org.clojure/clojurescript "0.0-2268"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [org.clojure/data.json "0.2.5"]
-                 [om "0.6.5"]
+                 [om "0.7.1"]
                  [ring "1.3.0"]
+                 [ring/ring-json "0.3.1"]
                  [compojure "1.1.8"]]
 
   :plugins [[lein-ring "0.8.11"]
@@ -19,7 +20,7 @@
   :resource-paths ["resources"]
   :main om-pages.core
 
-  :ring {:handler om-pages.core/routes
+  :ring {:handler om-pages.core/app
          :auto-reload? true}
 
   :cljsbuild {
@@ -29,4 +30,14 @@
                 :output-to "resources/public/js/om_pages.js"
                 :output-dir "resources/public/js/out"
                 :optimizations :none
-                :source-map true}}]})
+                :source-map true}}
+             {:id "prod"
+              :source-paths ["src/clj" "src/cljs"]
+              :compiler {
+                :output-to "resources/public/js/om_pages.js"
+                :output-dir "resources/public/js"
+                :optimizations :advanced
+                :pretty-print false
+                :preamble ["react/react.min.js"]
+                :externs ["react/externs/react.js" "lib/externs/tinymce.js"]
+                :source-map "resources/public/js/om_pages.js.map"}}]})

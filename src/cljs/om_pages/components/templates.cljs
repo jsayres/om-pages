@@ -22,7 +22,8 @@
       (dom/div #js {:id "main" :className "container"}
         (dom/div #js {:className "row"}
           (dom/div #js {:className "col-md-12"}
-            (dom/div #js {:dangerouslySetInnerHTML #js {:__html content}} nil))))
+            (dom/div #js {:id "content"
+                          :dangerouslySetInnerHTML #js {:__html content}} nil))))
       (dom/div #js {:id "footer" :className "container"}
         (dom/div #js {:className "row"}
           (dom/div #js {:className "col-md-12"} nil))))))
@@ -47,7 +48,8 @@
       (dom/div #js {:id "main" :className "container"}
         (dom/div #js {:className "row"}
           (dom/div #js {:className "col-md-12"}
-            (dom/div #js {:dangerouslySetInnerHTML #js {:__html content}} nil))))
+            (dom/div #js {:id "content"
+                          :dangerouslySetInnerHTML #js {:__html content}} nil))))
       (dom/div #js {:id "footer" :className "container"}
         (dom/div #js {:className "row"}
           (dom/div #js {:className "col-md-12"} nil))))))

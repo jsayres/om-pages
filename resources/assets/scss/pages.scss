@@ -11,6 +11,12 @@
   }
 }
 
+#modal {
+  .modal.fade {
+    display: block !important;
+  }
+}
+
 table#page-list {
   font-size: 12px;
   user-select: none;
@@ -31,9 +37,11 @@ table#page-list {
   }
 }
 
-#page-view {
+#page-view, #page-edit {
   display: flex;
+  background-color: #f0f0f0;
   #page-render {
+    background-color: #fff;
     flex: 1 0;
     margin: 20px 50px;
     border: 1px solid #ddd;

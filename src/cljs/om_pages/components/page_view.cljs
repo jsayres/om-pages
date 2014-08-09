@@ -9,7 +9,7 @@
 ;;;
 ; App-bar controls
 ;;;
-(defn publish-page! [page-id view-cursor]
+(defn publish-page [page-id view-cursor]
   (xhr-req
     {:method "PUT"
      :url (str "/api/pages/" page-id "/publish")
@@ -18,7 +18,7 @@
        (if (and (true? published) (nil? error))
          (om/update! view-cursor :published page-id)))}))
 
-(defn unpublish-page! [page-id view-cursor]
+(defn unpublish-page [page-id view-cursor]
   (xhr-req
     {:method "PUT"
      :url (str "/api/pages/" page-id "/unpublish")
@@ -34,7 +34,7 @@
       (let [{:keys [page-id published]} view-cursor
             published? (= page-id published)
             pub-text (if published? "Unpublish" "Publish")
-            pub-action (if published? unpublish-page! publish-page!)
+            pub-action (if published? unpublish-page publish-page)
             btn-classes "btn btn-default btn-sm navbar-btn"]
         (dom/div #js {:className "navbar-right"}
           (dom/a #js {:className (str btn-classes (when published? " btn-danger"))
@@ -68,7 +68,7 @@
     om/IRender
     (render [_]
       (let [{:keys [page-id branch-id published versions]} view-cursor
-            page (first (filter #(= (:id %) page-id) versions))
+            page (some #(when (= (:id %) page-id) %) versions)
             template (get templates (:template page "default"))]
         (dom/div nil
           (let [opts {:title {:text "Pages" :link "#"}
