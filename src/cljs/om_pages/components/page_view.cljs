@@ -2,13 +2,11 @@
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [om-pages.util :refer [xhr-req]]
-            [om-pages.components.util :refer [app-bar]]
+            [om-pages.components.util :refer [domify]]
+            [om-pages.components.app-bar :refer [app-bar]]
             [om-pages.components.templates :refer [templates]]))
 
 
-;;;
-; App-bar controls
-;;;
 (defn publish-page [page-id view-cursor]
   (xhr-req
     {:method "PUT"
@@ -27,25 +25,6 @@
        (if (and (false? published) (nil? error))
          (om/transact! view-cursor :published #(if (= page-id %) nil %))))}))
 
-(defn app-bar-controls [view-cursor owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [{:keys [page-id published]} view-cursor
-            published? (= page-id published)
-            pub-text (if published? "Unpublish" "Publish")
-            pub-action (if published? unpublish-page publish-page)
-            btn-classes "btn btn-default btn-sm navbar-btn"]
-        (dom/div #js {:className "navbar-right"}
-          (dom/a #js {:className (str btn-classes (when published? " btn-danger"))
-                      :onClick #(pub-action page-id view-cursor)} pub-text)
-          (dom/a #js {:className btn-classes :href (str "#" page-id "/edit")} "Edit")
-          (dom/a #js {:className btn-classes :href "#new"} "+"))))))
-
-
-;;;
-; Versions sidebar
-;;;
 (defn versions-sidebar [page-id versions]
   (let [get-date #(js/Date.parse (:date %))
         desc #(compare %2 %1)
@@ -59,22 +38,26 @@
               (dom/a #js {:href (str "#" id)} date (dom/br nil nil) author)))
           versions)))))
 
-
-;;;
-; Main view
-;;;
 (defn page-view [view-cursor owner]
   (reify
     om/IRender
     (render [_]
       (let [{:keys [page-id branch-id published versions]} view-cursor
             page (some #(when (= (:id %) page-id) %) versions)
-            template (get templates (:template page "default"))]
+            btn-classes "btn btn-default btn-sm navbar-btn"
+            template (get templates (:template page "default"))
+            dom-app-bar (domify app-bar view-cursor)]
         (dom/div nil
-          (let [opts {:title {:text "Pages" :link "#"}
-                      :subtitle {:text (:url page)}
-                      :controls app-bar-controls}]
-            (om/build app-bar view-cursor {:opts opts}))
+          (dom-app-bar {:title "Pages" :href "#"}
+            (dom/p #js {:className "navbar-text"} (:url page))
+            (dom/div #js {:className "navbar-right"}
+              (if (= page-id published)
+                (dom/a #js {:onClick #(unpublish-page page-id view-cursor)
+                            :className btn-classes} "Unpublish")
+                (dom/a #js {:onClick #(publish-page page-id view-cursor)
+                            :className btn-classes} "Publish"))
+              (dom/a #js {:className btn-classes :href (str "#" page-id "/edit")} "Edit")
+              (dom/a #js {:className btn-classes :href "#new"} "+")))
           (if (not page)
             (dom/div #js {:className "loading-page"} nil)
             (dom/div #js {:id "page-view"}

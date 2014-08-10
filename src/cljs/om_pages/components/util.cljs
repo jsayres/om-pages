@@ -6,15 +6,15 @@
 (defn render-check [bool]
   (if bool (dom/i #js {:className "fa fa-check"} nil)))
 
-(defn app-bar [cursor owner {:keys [title subtitle controls]}]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/nav #js {:className "app-bar navbar navbar-default navbar-static-top"}
-        (dom/div #js {:className "container-fluid"}
-          (dom/div #js {:className "app-bar-title navbar-header"}
-            (dom/a #js {:className "navbar-brand" :href (:link title)} (:text title)))
-          (dom/p #js {:className "navbar-text"}
-            (dom/a #js {:href (:link subtitle)} (:text subtitle)))
-          (om/build controls cursor))))))
+(defn domify
+  ([component cursor] (domify component cursor {}))
+  ([component cursor m]
+    (fn [attrs & children]
+      (om/build component cursor (assoc m :opts {:attrs attrs
+                                                 :children children})))))
+
+(defn domify-all
+  ([component cursors] (domify-all component cursors {}))
+  ([component cursors m] (map domify cursors (repeat m))))
+
 
