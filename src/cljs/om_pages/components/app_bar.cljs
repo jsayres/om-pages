@@ -3,10 +3,10 @@
             [om.dom :as dom :include-macros true]))
 
 
-(defn app-bar [cursor owner {:keys [attrs children]}]
+(defn app-bar [cursor owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ {:keys [attrs children]}]
       (let [{:keys [title href]} attrs]
         (dom/nav #js {:className "app-bar navbar navbar-default navbar-static-top"}
           (apply dom/div #js {:className "container-fluid"}
