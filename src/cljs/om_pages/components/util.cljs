@@ -17,17 +17,3 @@
   ([component cursors] (domify-all component cursors {}))
   ([component cursors m] (map domify cursors (repeat m))))
 
-
-(defn check-link [cursor owner {:keys [attrs children]}]
-  (reify
-    om/IRender
-    (render [_]
-      (apply dom/a attrs "√ " children) )))
-
-(defn stuff [cursor owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [dom-check-link (domify check-link cursor)]
-        (dom-check-link #js {:href "javascript:alert('Hello world!');"}
-          "Click here!")))))
