@@ -63,9 +63,9 @@
     (fn [app]
       (let [view-data (:view app)
             page (some #(when (= (:id %) (:page-id view-data)) %) (:versions view-data))]
-        (-> (assoc app :mode :edit)
-            (assoc-in [:edit :page-id] page-id)
-            (assoc-in [:edit :page] (when (= (:id page) page-id) page))))))
+        (assoc app :mode :edit :edit {:page-id page-id
+                                      :page (when (= (:id page) page-id) page)
+                                      :dirty false}))))
   (reload-page-edit-data app-cursor page-id))
 
 (defn set-view-from-route [app-cursor]
