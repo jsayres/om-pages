@@ -95,3 +95,4 @@
 
 (om/root pages-app app-data {:target (gdom/getElement "pages-app")})
 (om/root modal {} {:target (gdom/getElement "modal")})
+
